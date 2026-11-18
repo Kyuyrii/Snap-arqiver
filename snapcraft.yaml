@@ -1,0 +1,48 @@
+name: arqiver
+base: core24
+version: '1.0.2'
+platforms:
+  amd64:
+    build-on: [amd64]
+    build-for: [amd64]
+  arm64:
+    build-on: [arm64]
+    build-for: [arm64]
+summary: Simple Qt archive manager based on libarchive
+description: Arqiver is a simple and lightweight Qt archive manager as a front-end for libarchive (bsdtar), gzip and 7z
+grade: stable
+confinement: strict
+icon: arqiver.svg
+
+apps:
+  arqiver:
+    command: usr/bin/arqiver
+    desktop: usr/share/applications/arqiver.desktop
+    common-id: io.github.tsujan.arqiver
+    environment:
+      QT_QPA_PLATFORMTHEME: xdgdesktopportal
+    extensions: [kde-neon-6]
+    plugs:
+      - home
+      - removable-media
+
+plugs:
+  shared-memory:
+    private: true
+
+layout:
+  /usr/lib/7zip:
+    symlink: $SNAP/usr/lib/7zip
+
+parts:
+  arqiver-app:
+    plugin: cmake
+    source: https://github.com/tsujan/Arqiver.git
+    source-tag: V$SNAPCRAFT_PROJECT_VERSION
+    cmake-parameters:
+      - -DCMAKE_INSTALL_PREFIX=/usr
+
+  archiving-tools:
+    after: [arqiver-app]
+    plugin: nil
+    stage-packages: [gzip, 7zip, 7zip-rar, libarchive-tools]
